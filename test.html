@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0"/>
+<title>安心R行</title>
+<link rel="manifest" href="manifest.json"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<link rel="apple-touch-icon" href="512x512.png"/>
+<link href="splashscreens/iphone5_splash.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
+<link href="splashscreens/iphone6_splash.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
+<link href="splashscreens/iphoneplus_splash.png" media="(device-width: 621px) and (device-height: 1104px) and (-webkit-device-pixel-ratio: 3)" rel="apple-touch-startup-image" />
+<link href="splashscreens/iphonex_splash.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)" rel="apple-touch-startup-image" />
+<link href="splashscreens/iphonexr_splash.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
+<link href="splashscreens/iphonexsmax_splash.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)" rel="apple-touch-startup-image" />
+<link href="splashscreens/ipad_splash.png" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
+<link href="splashscreens/ipadpro1_splash.png" media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
+<link href="splashscreens/ipadpro3_splash.png" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
+<link href="splashscreens/ipadpro2_splash.png" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/js-mobile-console@0.4.0/style/mobile-console.min.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/onsen/2.11.2/css/onsenui.min.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/onsen/2.11.2/css/onsen-css-components.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/js-mobile-console@0.4.0/mobile-console.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/onsen/2.11.2/js/onsenui.min.js"></script>
+<script type="text/javascript" src="https://unpkg.com/@zxing/library@0.18.3/umd/index.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/jquery-dateformat@1.0.4/dist/jquery-dateformat.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue-router@3.5.1/dist/vue-router.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue-onsenui@2.6.2"></script>
+<script type="text/javascript">
+if('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js')
+      .then(() => console.log("Service Worker Registered"))
+      .catch(e => console.log(e));
+ }
+(($, ons)=> {
+$(_=>{
+     mobileConsole.show();
+     var myPlugin = {
+	     install(Vue, options) {
+		     Vue.prototype.$date = (fmt, diff) =>{
+			    var d = new Date();
+				if (diff) {
+				   d = new Date(d.getTime() + diff);
+				}
+			    return $.format.date(d, fmt);
+			 };
+		     Vue.mixin({
+    			created: function () {
+				this.$store = this.$root.$options.store;
+    			}
+		     });
+		 }
+	 };
+    // Vue.use(VueOnsen);
+	 Vue.use(myPlugin);
+     var store = {
+         location: {
+              nameZh: "test"
+         }
+     };
+	
+     const codeReader = new ZXing.BrowserMultiFormatReader();
+
+     var router = new VueRouter({
+         routes: [
+            {path: "/", component: {template: "#main"}},
+            {path: "/scan2d", component: {
+		    				template: "#scan2d",
+		    				mounted () {
+							codeReader.decodeFromVideoDevice(null, 'video-2d', (result, err) => {
+	    						//err = null;
+	   						//result = {text: "HKEN:0BdofZTKVeyJtZXRhZGF0YSI6eyJ0eXBlRW4iOiJQdWJsaWMgVG9pbGV0IiwidHlwZVpoIjoi5YWs5buBIn0sIm5hbWVaaCI6IuWxr+mWgOeivOmgreWFrOW7gSAiLCJuYW1lRW4iOiJUdWVuIE11biBGZXJyeSBQaWVyIFB1YmxpYyBUb2lsZXQgIiwidHlwZSI6IklNUE9SVCIsImhhc2giOiI3YzdiMDlmNTU4Y2E3OTgxZmMyYzEwZDcyZTU2MDYzOTc1ZDBlODhlYTc0MjQyOTA0YTVkNTk5NzI0NDAzMzcwIn0="}
+							if (err) {
+								//document.getElementById('result').textContent = err
+							} else if (result) {
+								if (!result.text.startsWith("HKEN:")) {
+									return;
+								}
+								try {
+									var text = result.text.substring(14);
+                                                                        console.log("Text1:", text);
+									text = decodeURIComponent(escape(atob(text)));
+                                                                        console.log("Text2:", text);
+									var info = JSON.parse(text);
+
+									Vue.set(store, "location", info);
+									//app.go({template: "#result", props: ["location", "popup", "checkout"], onsNavigatorProps: {location: info, popup: true, checkout: ["Y"]}}, true);
+									router.replace({path: "/result"});
+									/*
+									nav.pushPage("result.html", {data: {text: text, info: info}}).then(_=>{
+									   //$("#location", page).text(page[0].data.info.nameZh);
+									  // $("ons-dialog", page)[0].show();
+
+									});*/
+								} catch (e)  {
+                                                                    console.log("Err:", e.message);
+								}
+
+							    //document.getElementById('result').textContent = result.text
+							}
+   						 });
+						},
+		    				beforeDestroy (to, from, next) {
+							  codeReader.reset();
+						}
+					 }},
+            {path: "/result", props: {popup: true, location: {}, checkout: ["Y"]}, component: {template: "#result", props: ["popup", "location", "checkout"]}}
+
+         ]
+     });
+     var app = new Vue({
+	   el: "#app",
+	   router: router,
+	   store: store,
+	   data() {
+			return {
+
+			};
+	   }
+	});
+	
+ ons.disableAutoStyling();
+
+  ons.ready(_=>{
+    ons.enableDeviceBackButtonHandler();
+	
+	//app.config.isCustomElement = tag=>tag.startsWith("ons-");
+	//app.mount("main");
+  });
+ 
+ $("body").on("show", ".page-scan2d", e=>{
+
+   
+ });
+  $("body").on("hide", ".page-scan2d", e=>{
+});
+
+
+
+});
+})(jQuery, ons);
+</script>
+<style type="text/css">
+.page-home .page__background {    background-color: #11b181; }
+section {position: relative; min-height: 100%; padding-bottom: 5rem; box-sizing: border-box;}
+.page-home section::before {content: ""; position: absolute; top: 15rem; left: 0px; width: 100%; height: calc(100% - 14rem); background: #ffffff; overflow: hidden; z-index: -99;}
+.card {padding: 0px;}
+.card img {width: 100%;}
+.card__title {padding: 0.5rem 1rem; color: #11b188;}
+.card a:only-child {width: 100%; height: 100%; diplay: block;}
+.card a:only-child > span {display: block; line-height: 1.5rem;}
+.page-home header {color: #ffffff; padding: 0.5rem 1rem; text-shadow: 0.1rem 0.1rem #006600;}
+h2{font-size: 0.8rem;}
+h1 {font-size: 1.5rem; margin: 0rem;}
+.dialog-container h2 {font-size: 1.2rem; font-weight:  normal; margin: 3rem 0rem;}
+a {text-decoration: none; color: inherit;}
+:checked+.tabbar__button {color: #006600;}
+.btn-msg {padding: 1em; background: transparent; position: relative; }
+.btn-msg::before {content: ""; position: absolute; background-size: 10rem; background-color: #46e89d; opacity: 0.5; background-blend-mode: multiply; transform: scaleX(-1); border-radius: 8px; background-repeat: no-repeat; top:0px; left: 0px; width: 100%; height: 100%; z-index: -10; background-image: url('msg_bg.jpg');}
+.toolbar:not(.toolbar--transparent) {background-color: #11b181; color: #ffffff;}
+.toolbar__title {color: #ffffff; text-shadow: 0.1rem 0.1rem #006600;}
+.toolbar .back-button {color: #ffffff;}
+.toolbar .back-button__icon {fill: #ffffff;}
+.toolbar-button {color: #000000;}
+.page__background {background: #ffffff;}
+/*#tab-inbox .page__content p {position: absolute; width: 100%; text-align: center; top: 50%;}*/
+.list-item a {color: #006600; text-decoration: underline;}
+.list-item p {width: 100%; margin: 0px;}
+.scanner video {width: 100%; height: 100%;}
+.page-result .page__background {background-color: #11b181;}
+.page-result {color: #ffffff;}
+.result-info, .inbox-info {height: 100%;}
+.result-info .center, .inbox-info .center, .action .center {text-align: center;}
+.result-info strong {color: #ffdd00;}
+.action {width: 100%; position: absolute; bottom: 0px;}
+.action .button--large {display: block; margin: 1rem auto; }
+.button--large {width: 80%; max-width: 40rem; background-color: #ffdd00; color: #000000; border-radius: 2rem;}
+.button--large:active {background-color: #ddcc00;  opacity: inherit;}
+.button--large.other {color: #ffffff; text-shadow: 0.1rem 0.1rem #000000; background-color: #11b181;}
+.button--large.other:active {background-color: #03865f;}
+.dialog-container {background: #ffffff;}
+.popup-result section {padding-bottom: 8rem;}
+.page-scan2d .page__background {background-color: #000000;}
+.mask {position: absolute;  top:0px; left: 0px; width: 100%; height: 100%; z-index: 10; box-sizing: border-box; display: grid; grid-template-rows: auto 60vmin auto; grid-template-areas: 'a' 'b' 'c';}
+.mask::before {content: ''; grid-area: a;}
+.mask .caption {grid-area: c; color: #ffffff; padding: 3rem; text-align: center;}
+.mask > div {grid-area: b; display: grid; grid-template-areas: 'd e f';  grid-template-columns: auto 60vmin auto; position: relative;}
+.mask > div::before {content: ''; grid-area: d;}
+.mask > div::after {content: ''; grid-area: f;}
+.mask::before, .mask .caption, .mask > div::before, .mask> div::after {background-color: rgba(0,0,0, 0.7);}
+.viewfinder {position: relative;}
+.viewfinder div {width: 3rem; height: 3rem; position: absolute; box-sizing: border-box; border: 0em #11b181 solid; z-index: 10;}
+.viewfinder div:nth-child(1), .viewfinder div:nth-child(2) {top: -0.6rem; border-top-width: 0.6rem;}
+.viewfinder div:nth-child(3), .viewfinder div:nth-child(4) {bottom: -0.6rem; border-bottom-width: 0.6rem;}
+.viewfinder div:nth-child(1), .viewfinder div:nth-child(3) {left: -0.6rem; border-left-width: 0.6em;}
+.viewfinder div:nth-child(2), .viewfinder div:nth-child(4) {right: -0.6rem; border-right-width: 0.6rem;}
+.card__title .right {float: right;}
+.card__content {position: absolute; bottom: 0px; left: 0px; padding: 5rem 2rem; color: #ffffff; text-shadow: 0.1rem 0.1rem #000000;}
+.card__content h2 {margin: 0px;}
+.checkbox {padding-right: 0.5em;}
+.checkbox__checkmark:before {border-radius: 2px; background: #ffffff; border: 0px;}
+:checked+.checkbox__checkmark:before {background: #ffffff;}
+.checkbox__checkmark:after {border-color: #11b181; border-width: 2px;}
+</style>
+</head>
+<body>
+<div id="app">
+<router-view></router-view>
+</div>
+
+
+<template id="nav" >
+<v-ons-navigator animation="none" :page-stack="pageStack" @push-page="console.log('Push: ', $event); pageStack.push($event)"
+  @replace-page="pageStack.pop(); pageStack.push($event)"></v-ons-navigator>
+</template>
+
+<template id="main">
+<v-ons-page >
+
+  <v-ons-tabbar position="bottom" :tabs="[
+  {label: '主頁', icon:'md-home', page: {template: '#home'}},
+    {label: '收件箱', icon:'md-email', page: {template: '#inbox', props: ['location', 'popup', 'checkout']}, props: {location: {nameZh: 'Test'}, popup: true, checkout: ['Y']}},
+  {label: '設定', icon:'md-settings', page: {template: '#settings'}}
+  ]" >
+
+  </v-ons-tabbar>
+
+
+</v-ons-page>
+</template>
+
+
+
+<template id="home">
+  <v-ons-page class="page-home">
+  <section>
+  <header>
+  <h2 class="title-2">{{$date('yyyy-MM-dd')}}, 星期{{ ({
+     mon: "一", tue: "二", wed: "三", thu: "四", fri: "五", sat: "六", sun: "日"
+  })[$date('E').toLowerCase()] }}</h2>
+
+  <h1 class="title-1">記錄你的到訪</h1>
+  </header>
+
+
+   <v-ons-carousel swipeable auto-scroll overscrollable id="carousel" item-width="80%">
+    <v-ons-carousel-item  >
+      <v-ons-card @click="$router.push('/scan2d')">
+      <img src="home_enter.jpg"/>
+      <div class="title">按此進入<div class="right"><v-ons-icon icon="md-chevron-right" class="list-item__icon"/></div></div>
+	  <div class="content"><h2>進入</h2>掃描安心R行二維碼以記錄到訪</div>
+      </v-ons-card>
+    </v-ons-carousel-item>
+     <v-ons-carousel-item>
+      <v-ons-card>
+      <img src="home_taxi.jpg"/>
+      <div class="title">按此進入<div class="right"><v-ons-icon icon="md-chevron-right" class="list-item__icon"/></div></div>
+      <div class="content"><h2>上車</h2>乘搭的士時請掃描車廂內的車牌</div>
+	 </v-ons-card>
+    </v-ons-carousel-item>
+     <v-ons-carousel-item>
+      <v-ons-card>
+      <img src="home_confirmed.jpg"/>
+      <div class="title">按此進入<div class="right"><v-ons-icon icon="md-chevron-right" class="list-item__icon"/></div></div>
+      <div class="content"><h2>報告確診或初步確診</h2>用戶如被確診或初步確診，須上載其出行記錄給防護中心,協助個案調查及提供感染風險通知給其他相關用戶</div>
+	  </v-ons-card>
+    </v-ons-carousel-item>
+  </v-ons-carousel>
+  <v-ons-card class="btn-msg">
+  <a href="#">
+  <span><small>最後更新<span id="date-update">{{$date('yyyy-MM-dd', -1 * 24 * 3600 * 1000)}}</span></small></span>
+  <span><strong>0</strong>次感染風險通知</span>
+  <span><small>更多詳細訊息</small></span>
+  </a>
+  
+  </v-ons-card>
+  </section>
+  </v-ons-page>
+  
+
+</template>
+
+
+<template id="inbox">
+  <v-ons-page>
+  <v-ons-toolbar>
+  <div class="center">收件箱</div>
+  </v-ons-toolbar>
+   <v-ons-row vertical-align="center" class="inbox-info">
+  <v-ons-col class="center">
+  無訊息
+  </v-ons-col>
+  </v-ons-row>
+  </v-ons-page>
+</template>
+
+<template id="settings">
+  <v-ons-page>
+  <v-ons-toolbar>
+  <div class="center">設定</div>
+  </v-ons-toolbar>
+  <v-ons-list modifier="noborder">
+    <v-ons-list-item tappable><div class="center"><p>每日更新</p>
+	<p><small>最後更新<span id="date-update">{{$date('yyyy-MM-dd HH:mm:ss', - 5 * 24 * 3600 * 1000)}}</span></small></p></div>
+	<div class="right"><v-ons-icon icon="md-refresh" class="list-item__icon"></div></v-ons-list-item>
+    <v-ons-list-item tappable>語言 <div class="right"><v-ons-icon icon="md-chevron-right" class="list-item__icon"/></div></v-ons-list-item>
+    <v-ons-list-item tappable>R行記錄<div class="right"><v-ons-icon icon="md-chevron-right" class="list-item__icon"/></div></v-ons-list-item>
+    <v-ons-list-item tappable>個人資料收集聲明<div class="right"><v-ons-icon icon="md-chevron-right" class="list-item__icon"/></div></v-ons-list-item>
+    <v-ons-list-item tappable>私隱政策<div class="right"><v-ons-icon icon="md-chevron-right" class="list-item__icon"/></div></v-ons-list-item>
+    <v-ons-list-item tappable>條款及細則<div class="right"><v-ons-icon icon="md-chevron-right" class="list-item__icon"/></div></v-ons-list-item>
+	<v-ons-list-item tappable>歡迎使用安心R行<div class="right"><v-ons-icon icon="md-chevron-right" class="list-item__icon"/></div></v-ons-list-item>
+	<v-ons-list-item prevent-tap modifier="nodivider">關於<a href="#">安心R行</a><span class="right">版本1.1.4</span></v-ons-list-item>
+
+
+
+  </v-ons-page>
+</template>
+
+<template id="scan2d">
+  <v-ons-page class="scanner page-scan2d">
+  <v-ons-toolbar>
+  <div class="left"> <v-ons-back-button @click="$router.back()"></v-ons-back-button></div>
+
+  <div class="center">掃描二維碼</div>
+  </v-ons-toolbar>
+  <div class="mask"><div><div class="viewfinder"><div></div><div></div><div></div><div></div></div></div><span class="caption">掃描二維碼</span></div>
+  <video id="video-2d"/>
+  </v-ons-page>
+</template>
+
+<template id="result">
+  <v-ons-page class="page-result">
+  
+  <v-ons-dialog :visible.sync="popup" class="popup-result" >
+    <v-ons-toolbar modifier="transparent" inline="true">
+      <div class="right"><v-ons-toolbar-button @click="console.log('click');popup=false"><v-ons-icon icon="fa-times" ></v-ons-toolbar-button></div>
+    </v-ons-toolbar>
+	<section>
+    <v-ons-row vertical-align="center" class="result-info">
+    <v-ons-col>
+    <div class="center"><small>你已進入場所</small></div>
+    <h1 class="center">{{$store.location.nameZh == null? $store.location.nameEn: $store.location.nameZh}}</center></h1>
+    <div class="center"><small>{{$date('yyyy-MM-dd HH:mm')}}</small></div>
+	<h2 class="center">你現在離開嗎？</h2>
+    <div class="center"><small>{{$date('yyyy-MM-dd HH:mm', 4 * 3600 * 1000)}}自動離開</small></div>
+
+    </v-ons-col>
+  </v-ons-row>
+   </section>
+   <div class="action">
+     <v-ons-button modifier="large" @click="popup=false">是的，我現在要離開</v-ons-button>
+     <v-ons-button modifier="large" @click="popup=false" class="other">我己經離開了</v-ons-button>
+  </div>
+ 
+  </v-ons-dialog>
+  <v-ons-toolbar modifier="transparent" inline="true">
+  </v-ons-toolbar>
+  <section>
+  <v-ons-row vertical-align="center" class="result-info">
+  <v-ons-col>
+  <p class="center"><small>你已進入場所</small></p>
+  <p class="center"><h1><center><strong>{{$store.location.nameZh == null? $store.location.nameEn: $store.location.nameZh}}</strong></center></h1></p>
+  <p class="center">{{$date('yyyy-MM-dd HH:mm')}}</p>
+  <p class="center"><v-ons-icon class="far" icon="fa-check-circle" size="10rem"></ion-icon></p>
+  </v-ons-col>
+  </v-ons-row>
+  
+
+  </section>
+    <div class="action">
+  <div class="center"><small><v-ons-checkbox value="Y" v-model="checkout"></v-ons-checkbox><label>{{$date('yyyy-MM-dd HH:mm', 4 * 3600 * 1000)}}自動離開</label></small></div>
+
+  <v-ons-button modifier="large" @click="$router.replace('/')">離開</v-ons-button>
+  </div>
+  </v-ons-page>
+</template>
+
+</body>
+</html>
